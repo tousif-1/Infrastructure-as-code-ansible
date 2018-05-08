@@ -14,6 +14,7 @@ pipeline {
                 sh "echo Branch: ${env.BRANCH_NAME}"
                 sh "pwd"
                 sh "ls -al"
+                sh "ansible-playbook -i inventory playbook.yml -e @extravar.yml"
             }
         }
 
