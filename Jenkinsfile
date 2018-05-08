@@ -27,6 +27,13 @@ pipeline {
         	  body: "check ${env.JOB_NAME} [env.${BUILD_NUMBER}]"
         )
       } 
+
+    	success {
+        	emailext(
+        	  subject: "${env.JOB_NAME} [env.${BUILD_NUMBER}] Succeeded!",
+        	  body: "check ${env.JOB_NAME} [env.${BUILD_NUMBER}]"
+        )
+      } 
     } 
 }
 

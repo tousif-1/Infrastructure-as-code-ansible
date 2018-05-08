@@ -14,7 +14,7 @@
                #!/bin/sh
                echo '123' |sudo passwd root --stdin
                sudo yum install httpd -y
-               echo "host in public subnet1" > /var/www/html/index.html
+               echo "ApacheWeb1 in public subnet1" > /var/www/html/index.html
                sudo systemctl restart httpd
                sudo systemctl enable httpd
     wait: true
