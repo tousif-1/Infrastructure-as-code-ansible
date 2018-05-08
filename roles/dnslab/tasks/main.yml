@@ -1,0 +1,128 @@
+---
+
+- name: Create an ec2 instance in public subnet1
+  ec2:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    key_name: "{{ key_name }}"
+    group_id: "{{ ec2_security_group_id }}"  # security group name
+    instance_type: "{{ instance_type }}"
+    vpc_subnet_id: "{{ public_subnet_1_id }}"
+    image: "{{ ami_id }}"
+    region: "{{ aws_region }}"
+    user_data: |
+               #!/bin/sh
+               echo '123' |sudo passwd root --stdin
+               hostname 'DNS-server'
+               sudo yum install -y vim nmap elinks
+    wait: true
+    count: 1  # default
+    count_tag:
+      Name: DNSserver
+    instance_tags:
+      Name: DNSserver
+    assign_public_ip: yes
+  register: ec2_1
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ item.public_dns_name }}"
+    port: 22
+    delay: 10
+    timeout: 60
+    state: started
+  with_items: "{{ ec2_1.instances }}"
+
+- debug: 
+    msg: " ec2 url - {{ec2_1.instances[0].public_dns_name}}"
+
+- name:
+  set_fact:
+    ec2_ins_1_id:          "{{ ec2_1.instances[0].id }}"
+
+- name: Create an ec2 instance in public subnet1
+  ec2:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    key_name: "{{ key_name }}"
+    group_id: "{{ ec2_security_group_id }}"  # security group name
+    instance_type: "{{ instance_type }}"
+    vpc_subnet_id: "{{ public_subnet_1_id }}"
+    image: "{{ ami_id }}"
+    region: "{{ aws_region }}"
+    user_data: |
+               #!/bin/sh
+               echo '123' |sudo passwd root --stdin
+               hostname WEB-server
+               sudo yum install httpd -y
+               echo "host in public subnet1" > /var/www/html/index.html
+               sudo systemctl restart httpd
+               sudo systemctl enable httpd
+               sudo yum install -y vim nmap elinks
+    wait: true
+    wait: true
+    count: 1  # default
+    count_tag:
+      Name: webserver
+    instance_tags:
+      Name: webserver
+    assign_public_ip: yes
+  register: ec2_2
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ item.public_dns_name }}"
+    port: 22
+    delay: 10
+    timeout: 60
+    state: started
+  with_items: "{{ ec2_2.instances }}"
+
+- debug: 
+    msg: "ec2 url - {{ ec2_2.instances[0].public_dns_name }}"
+
+- name:
+  set_fact:
+    ec2_ins_2_id: "{{ ec2_2.instances[0].id }}"
+
+- name: Create an ec2 instance in public subnet1
+  ec2:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    key_name: "{{ key_name }}"
+    group_id: "{{ ec2_security_group_id }}"  # security group name
+    instance_type: "{{ instance_type }}"
+    vpc_subnet_id: "{{ public_subnet_1_id }}"
+    image: "{{ ami_id }}"
+    region: "{{ aws_region }}"
+    user_data: |
+               #!/bin/sh
+               echo '123' |sudo passwd root --stdin
+               hostname Host-client
+               sudo yum install -y vim nmap elinks
+    wait: true
+    wait: true
+    count: 1  # default
+    count_tag:
+      Name: hostclient
+    instance_tags:
+      Name: hostclient
+    assign_public_ip: yes
+  register: ec2_3
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ item.public_dns_name }}"
+    port: 22
+    delay: 10
+    timeout: 60
+    state: started
+  with_items: "{{ ec2_3.instances }}"
+
+- debug: 
+    msg: "ec2 url - {{ ec2_3.instances[0].public_dns_name }}"
+
+- name:
+  set_fact:
+    ec2_ins_2_id: "{{ ec2_3.instances[0].id }}"
+

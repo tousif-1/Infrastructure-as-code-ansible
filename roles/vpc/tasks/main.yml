@@ -1,0 +1,228 @@
+---
+
+# roles/vpc/tasks/main.yml
+#
+#
+# 1st task: creating the vpc
+# we are using the variables set in the var.yml
+# The module gives us back its results,
+# which contains information about our new vpc.
+# We register it in the variable my_vpc.
+ 
+
+
+- name:  create the VPC
+  ec2_vpc_net:
+    name:           "{{ vpc_name }}"
+    cidr_block:     "{{ vpc_cidr_block }}"
+    region:         "{{ aws_region  }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    state:          "present"
+  register: my_vpc
+
+
+# We now use the set_fact module 
+# to save the id of the VPC in a new variable.
+
+- name:
+  set_fact: 
+    vpc_id:          "{{ my_vpc.vpc.id }}"
+- debug:
+    msg: "my_vpc - {{ my_vpc.vpc.id }}"
+
+# Create IGW (internet gateway) for the vpc
+- name: create IGW
+  ec2_vpc_igw:
+    state:          "present"
+    vpc_id:         "{{ vpc_id }}"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    resource_tags:
+      Name:          "Internet gateway for {{ vpc_name }}"
+  register: my_vpc_igw
+    
+
+# We save the id of the Internet Gateway in a new variable.
+
+- name:               Set Internet Gateway ID in variable
+  set_fact:
+    igw_id:           "{{ my_vpc_igw.gateway_id }}"
+
+- name:   create public subnet1
+  ec2_vpc_subnet:
+    state:          "present"
+    vpc_id:         "{{ vpc_id }}"
+    cidr:           "{{ public_subnet_1_cidr }}"
+    az:             "{{ aws_region }}a"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    map_public: true
+    resource_tags:
+      Name:          "Public Subnet 1 in {{ vpc_name }}"
+  register: my_public_subnet_1
+# We save the id of the Public Subnet in a new variable.
+
+- name:    Set Public Subnet ID in variable
+  set_fact:
+    public_subnet_1_id: "{{ my_public_subnet_1.subnet.id }}"
+- debug:
+    msg: "public_subnet_1_id: {{ my_public_subnet_1.subnet.id }}"
+
+- name:   create public subnet2
+  ec2_vpc_subnet:
+    state:          "present"
+    vpc_id:         "{{ vpc_id }}"
+    cidr:           "{{ public_subnet_2_cidr }}"
+    az:             "{{ aws_region }}b"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    map_public: true
+    resource_tags:
+      Name:          "Public Subnet 2 in {{ vpc_name }}"
+  register: my_public_subnet_2
+
+# We save the id of the Public Subnet in a new variable.
+- name:    Set Public Subnet ID in variable
+  set_fact:
+    public_subnet_2_id: "{{ my_public_subnet_2.subnet.id }}"
+- debug:
+    msg: "public_subnet_2_id: {{ my_public_subnet_2.subnet.id }}"
+
+- name:   create private subnet1
+  ec2_vpc_subnet:
+    state:          "present"
+    vpc_id:         "{{ vpc_id }}"
+    cidr:           "{{ private_subnet_1_cidr }}"
+    az:             "{{ aws_region }}a"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    resource_tags:
+      Name:          "Private Subnet 1 in {{ vpc_name }}"
+  register: my_private_subnet_1
+
+# We save the id of the Private Subnet in a new variable.
+- name:    Set Private Subnet ID in variable
+  set_fact:
+    private_subnet_1_id: "{{ my_private_subnet_1.subnet.id }}"
+- debug:
+    msg: "private_subnet_1_id: {{ my_private_subnet_1.subnet.id }}"
+
+- name:   create private subnet2
+  ec2_vpc_subnet:
+    state:          "present"
+    vpc_id:         "{{ vpc_id }}"
+    cidr:           "{{ private_subnet_2_cidr }}"
+    az:             "{{ aws_region }}b"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    resource_tags:
+      Name:          "Private Subnet 2 in {{ vpc_name }}"
+  register: my_private_subnet_2
+
+# We save the id of the Private Subnet in a new variable.
+- name:    Set Private Subnet ID in variable
+  set_fact:
+    private_subnet_2_id: "{{ my_private_subnet_2.subnet.id }}"
+- debug:
+    msg: "private_subnet_2_id: {{ my_private_subnet_2.subnet.id }}"
+
+# set up route table for public subnet
+- name:   set up public subnet route table
+  ec2_vpc_route_table:
+    state:          "present"
+    vpc_id:         "{{ vpc_id }}"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    tags:
+      Name:          "Public subnet route table"
+    subnets:
+    - "{{ public_subnet_1_id }}"
+    - "{{ public_subnet_2_id }}"
+    routes:
+    - dest:        "0.0.0.0/0"
+      gateway_id:  "{{ igw_id }}"
+
+# set up route table for private subnet
+- name:   set up private subnet route table
+  ec2_vpc_route_table:
+    state:          "present"
+    vpc_id:         "{{ vpc_id }}"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    tags:
+      Name:          "Private subnet route table"
+    subnets:
+    - "{{ private_subnet_1_id }}"
+    - "{{ private_subnet_2_id }}"
+#    routes:
+#    - dest:        "0.0.0.0/0"
+#      gateway_id:  "{{ igw_id }}"
+
+# create security group for ec2
+- name: create security group for ec2
+  ec2_group:
+    name:           "EC2 Security group"
+    description:    "EC2 security group"
+    vpc_id:         "{{ vpc_id }}"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    rules:
+    - proto:    "tcp"
+      from_port: "22"
+      to_port:   "22"
+      cidr_ip:   "0.0.0.0/0"
+    - proto:    "udp"
+      from_port: "53"
+      to_port:   "53"
+      cidr_ip:   "0.0.0.0/0"
+    - proto:    "tcp"
+      from_port: "53"
+      to_port:   "53"
+      cidr_ip:   "0.0.0.0/0"
+    - proto:    "tcp"
+      from_port: "80"
+      to_port:   "80"
+      cidr_ip:   "0.0.0.0/0"
+  register: my_ec2_group
+
+# We save the id of ec2 security group
+- name:    Set ec2 security gruop id in variable
+  set_fact:
+    ec2_security_group_id: "{{ my_ec2_group.group_id }}"
+- debug:
+    msg: "ec2_security_group_id: {{ ec2_security_group_id }}"
+
+# create security group for elb
+- name: create security group for elb
+  ec2_group:
+    name:           "ELB Security group"
+    description:    "ELB security group"
+    vpc_id:         "{{ vpc_id }}"
+    region:         "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    rules:
+    - proto:    "tcp"
+      from_port: "80"
+      to_port:   "80"
+      cidr_ip:   "0.0.0.0/0"
+  register: my_elb_group
+
+# We save the id of elb security group
+- name:    Set elb security gruop id in variable
+  set_fact:
+    elb_security_group_id: "{{ my_elb_group.group_id }}"
+- debug:
+    msg: "elb_security_group_id: {{ elb_security_group_id }}"
+
+
+

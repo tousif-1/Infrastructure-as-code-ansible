@@ -1,0 +1,11 @@
+---
+- hosts: local
+  gather_facts: False
+#  vars:
+#    ec2_ins_1: "i-0b73c61d1611e7b08"
+#    ec2_ins_2: "i-05271775041af6322"
+  roles:
+    - vpc
+    - ec2
+#    - dnslab
+#    - ELB

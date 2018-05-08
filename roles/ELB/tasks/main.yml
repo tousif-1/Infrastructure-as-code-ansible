@@ -1,0 +1,50 @@
+---
+##################################################
+# create a classic ELB and add two apache web 
+# server, set listener port and health check.
+# check url is available then return ELB dns name.
+####################################################
+
+- name: create apache elb 
+  ec2_elb_lb:
+    name: apache-web-server-elb-sample
+    state: present
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    security_group_ids: "{{ elb_security_group_id }}"
+    subnets:
+    - "{{ public_subnet_1_id }}"
+    - "{{ public_subnet_2_id }}"   
+    instance_ids:
+    - "{{ ec2_ins_1_id }}"
+#    - "{{ ec2_ins_2_id }}"   
+    cross_az_load_balancing: "yes"
+#    zones: 
+#    - "{{ aws_region }}a"
+#    - "{{ aws_region }}b"
+    listeners:
+    - protocol: tcp
+      load_balancer_port: 80
+      instance_port: 80
+    health_check:
+      ping_protocol: http # options are http, https, ssl, tcp
+      ping_port: 80
+      ping_path: "/index.html" # not required for tcp or ssl
+      response_timeout: 5 # seconds
+      interval: 10 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 2
+  ignore_errors: yes
+  register: ec2_elb
+
+- name: Wait untils elb is available
+  command: curl --head --silent {{ ec2_elb.elb.dns_name }}
+  register: result
+  until: result.stdout.find("200 OK") != -1
+  retries: 60
+  delay: 5
+  changed_when: false
+
+- debug:
+    msg: "elb dsn name: {{ ec2_elb.elb.dns_name }}"

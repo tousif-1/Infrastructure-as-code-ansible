@@ -1,0 +1,85 @@
+---
+
+- name: Create an ec2 instance in public subnet1
+  ec2:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    key_name: "{{ key_name }}"
+    group_id: "{{ ec2_security_group_id }}"  # security group name
+    instance_type: "{{ instance_type }}"
+    vpc_subnet_id: "{{ public_subnet_1_id }}"
+    image: "{{ ami_id }}"
+    region: "{{ aws_region }}"
+    user_data: |
+               #!/bin/sh
+               echo '123' |sudo passwd root --stdin
+               sudo yum install httpd -y
+               echo "host in public subnet1" > /var/www/html/index.html
+               sudo systemctl restart httpd
+               sudo systemctl enable httpd
+    wait: true
+    count: 1  # default
+    count_tag:
+      Name: DemoApache
+    instance_tags:
+      Name: DemoApache
+    assign_public_ip: yes
+  register: ec2_pub_subnet1
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ item.public_dns_name }}"
+    port: 22
+    delay: 10
+    timeout: 60
+    state: started
+  with_items: "{{ ec2_pub_subnet1.instances }}"
+
+- debug: 
+    msg: " ec2 url - {{ec2_pub_subnet1.instances[0].public_dns_name}}"
+
+- name:
+  set_fact:
+    ec2_ins_1_id:          "{{ ec2_pub_subnet1.instances[0].id }}"
+
+#- name: Create an ec2 instance in public subnet2
+#  ec2:
+#    aws_access_key: "{{ aws_access_key }}"
+#    aws_secret_key: "{{ aws_secret_key }}"
+#    key_name: "{{ key_name }}"
+#    group_id: "{{ ec2_security_group_id }}"  # security group name
+#    instance_type: "{{ instance_type }}"
+#    vpc_subnet_id: "{{ public_subnet_2_id }}"
+#    image: "{{ ami_id }}"
+#    region: "{{ aws_region }}"
+#    user_data: |
+#               #!/bin/sh
+#               echo '123' |sudo passwd root --stdin
+#               sudo yum install httpd -y
+#               echo "host in public subnet2" > /var/www/html/index.html
+#               sudo systemctl restart httpd
+#               sudo systemctl enable httpd
+#    wait: true
+#    count: 1  # default
+#    count_tag:
+#      Name: DemoApache
+#    instance_tags:
+#      Name: DemoApache
+#    assign_public_ip: yes
+#  register: ec2_pub_subnet2
+#
+#- name: Wait for SSH to come up
+#  wait_for:
+#    host: "{{ item.public_dns_name }}"
+#    port: 22
+#    delay: 10
+#    timeout: 60
+#    state: started
+#  with_items: "{{ ec2_pub_subnet2.instances }}"
+#
+#- debug: 
+#    msg: "ec2 url - {{ ec2_pub_subnet2.instances[0].public_dns_name }}"
+#
+#- name:
+#  set_fact:
+#    ec2_ins_2_id:          "{{ ec2_pub_subnet2.instances[0].id }}"
