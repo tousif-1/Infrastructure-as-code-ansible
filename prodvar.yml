@@ -1,3 +1,4 @@
 ---
 key_name: "devopssyd"
 vpc_name: "VPC-PROD"
+env_to_deploy: "prod"

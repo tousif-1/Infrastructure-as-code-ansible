@@ -7,7 +7,7 @@
 
 - name: create apache elb 
   ec2_elb_lb:
-    name: apache-web-server-elb-sample
+    name: "{{ env_to_deploy }}"apache-server-elb
     state: present
     region: "{{ aws_region }}"
     security_group_ids: "{{ elb_security_group_id }}"
