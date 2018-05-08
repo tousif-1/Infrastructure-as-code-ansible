@@ -55,6 +55,7 @@
     region:         "{{ aws_region }}"
     map_public: true
     wait: yes
+    wait_timeout: 300
     resource_tags:
       Name:          "Public Subnet 1 in {{ vpc_name }}"
   register: my_public_subnet_1
@@ -75,6 +76,7 @@
     region:         "{{ aws_region }}"
     map_public: true
     wait: yes
+    wait_timeout: 300
     resource_tags:
       Name:          "Public Subnet 2 in {{ vpc_name }}"
   register: my_public_subnet_2
@@ -90,6 +92,7 @@
   ec2_vpc_subnet:
     state:          "present"
     wait: yes
+    wait_timeout: 300
     vpc_id:         "{{ vpc_id }}"
     cidr:           "{{ private_subnet_1_cidr }}"
     az:             "{{ aws_region }}a"
@@ -109,6 +112,7 @@
   ec2_vpc_subnet:
     state:          "present"
     wait: yes
+    wait_timeout: 300
     vpc_id:         "{{ vpc_id }}"
     cidr:           "{{ private_subnet_2_cidr }}"
     az:             "{{ aws_region }}b"
