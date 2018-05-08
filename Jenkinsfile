@@ -13,7 +13,7 @@ pipeline {
             steps {
                 sh "echo Branch: ${env.BRANCH_NAME}"
                 sh "pwd"
-                sh "ll -a"
+                sh "ls -al"
             }
         }
 
