@@ -15,7 +15,7 @@ pipeline {
             }
             steps {
                 sh "echo Branch: ${env.BRANCH_NAME}"
-                sh "ansible-playbook -i inventory playbook.yml -e @testvar.yml"
+                sh "ansible-playbook -i inventory playbook.yml -e @testvar.yml -vvv"
             }
         }
 
