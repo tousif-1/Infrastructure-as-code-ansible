@@ -2,3 +2,4 @@
 
 instance_type: "t2.micro"
 ami_id: "ami-67589505"
+ec2-ins-id-1: "i-prod-201805080001"

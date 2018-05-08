@@ -2,6 +2,7 @@
 
 - name: Create an ec2 instance in public subnet1
   ec2:
+    id: "{{ ec2-ins-id-1 }}"
     key_name: "{{ key_name }}"
     group_id: "{{ ec2_security_group_id }}"  # security group name
     instance_type: "{{ instance_type }}"
