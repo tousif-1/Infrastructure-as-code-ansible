@@ -8,4 +8,4 @@
     - vpc
     - ec2
 #    - dnslab
-#    - ELB
+    - ELB
