@@ -1,4 +1,4 @@
 ---
 key_name: "devopssyd"
-vpc_name: "DevOpsVPC"
+vpc_name: "testVPC"
 env_to_deploy: "test"
