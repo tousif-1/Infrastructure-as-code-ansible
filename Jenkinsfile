@@ -6,18 +6,31 @@ pipeline {
 		MAJOR_VERSION = 1
     }
     stages {
-        stage('deploy') {
+        stage('deploy-test') {
             agent {
                 label 'master'
             }
+            when {
+                branch 'development'
+            }
             steps {
                 sh "echo Branch: ${env.BRANCH_NAME}"
-                sh "pwd"
-                sh "ls -al"
-                sh "ansible-playbook -i inventory playbook.yml -e @extravar.yml"
+                sh "ansible-playbook -i inventory playbook.yml -e @testvar.yml"
             }
         }
 
+        stage('deploy-prod') {
+            agent {
+                label 'master'
+            }
+            when {
+                branch 'master'
+            }
+            steps {
+                sh "echo Branch: ${env.BRANCH_NAME}"
+                sh "ansible-playbook -i inventory playbook.yml -e @prodvar.yml"
+            }
+        }
 
     }
     post {

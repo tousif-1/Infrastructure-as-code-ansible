@@ -3,7 +3,7 @@
 aws_region: "ap-southeast-2"
 
 #VPC information
-vpc_name: "DevOpsVPC"
+#vpc_name: "DevOpsVPC"
 vpc_cidr_block: "10.0.0.0/16"
 
 #public subnet 1
