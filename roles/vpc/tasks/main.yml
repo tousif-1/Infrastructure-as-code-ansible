@@ -16,8 +16,6 @@
     name:           "{{ vpc_name }}"
     cidr_block:     "{{ vpc_cidr_block }}"
     region:         "{{ aws_region  }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     state:          "present"
   register: my_vpc
 
@@ -37,8 +35,6 @@
     state:          "present"
     vpc_id:         "{{ vpc_id }}"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     resource_tags:
       Name:          "Internet gateway for {{ vpc_name }}"
   register: my_vpc_igw
@@ -57,8 +53,6 @@
     cidr:           "{{ public_subnet_1_cidr }}"
     az:             "{{ aws_region }}a"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     map_public: true
     resource_tags:
       Name:          "Public Subnet 1 in {{ vpc_name }}"
@@ -78,8 +72,6 @@
     cidr:           "{{ public_subnet_2_cidr }}"
     az:             "{{ aws_region }}b"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     map_public: true
     resource_tags:
       Name:          "Public Subnet 2 in {{ vpc_name }}"
@@ -99,8 +91,6 @@
     cidr:           "{{ private_subnet_1_cidr }}"
     az:             "{{ aws_region }}a"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     resource_tags:
       Name:          "Private Subnet 1 in {{ vpc_name }}"
   register: my_private_subnet_1
@@ -119,8 +109,6 @@
     cidr:           "{{ private_subnet_2_cidr }}"
     az:             "{{ aws_region }}b"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     resource_tags:
       Name:          "Private Subnet 2 in {{ vpc_name }}"
   register: my_private_subnet_2
@@ -138,8 +126,6 @@
     state:          "present"
     vpc_id:         "{{ vpc_id }}"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     tags:
       Name:          "Public subnet route table"
     subnets:
@@ -155,8 +141,6 @@
     state:          "present"
     vpc_id:         "{{ vpc_id }}"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     tags:
       Name:          "Private subnet route table"
     subnets:
@@ -173,8 +157,6 @@
     description:    "EC2 security group"
     vpc_id:         "{{ vpc_id }}"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     rules:
     - proto:    "tcp"
       from_port: "22"
@@ -208,8 +190,6 @@
     description:    "ELB security group"
     vpc_id:         "{{ vpc_id }}"
     region:         "{{ aws_region }}"
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     rules:
     - proto:    "tcp"
       from_port: "80"
