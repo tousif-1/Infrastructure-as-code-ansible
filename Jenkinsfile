@@ -24,14 +24,16 @@ pipeline {
     	failure {
         	emailext(
         	  subject: "${env.JOB_NAME} [env.${BUILD_NUMBER}] Failed!",
-        	  body: "check ${env.JOB_NAME} [env.${BUILD_NUMBER}]"
+        	  body: "check ${env.JOB_NAME} [env.${BUILD_NUMBER}]",
+              to: "wangnan.alvin@gmail.com"
         )
       } 
 
     	success {
         	emailext(
         	  subject: "${env.JOB_NAME} [env.${BUILD_NUMBER}] Succeeded!",
-        	  body: "check ${env.JOB_NAME} [env.${BUILD_NUMBER}]"
+        	  body: "check ${env.JOB_NAME} [env.${BUILD_NUMBER}]",
+              to: "wangnan.alvin@gmail.com"
         )
       } 
     } 
