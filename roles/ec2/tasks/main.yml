@@ -2,7 +2,8 @@
 
 - name: Create an ec2 instance in public subnet1
   ec2:
-    id: "{{ ec2-ins-id-1 }}"
+    instance_tags:
+      Name: ApacheWeb1
     key_name: "{{ key_name }}"
     group_id: "{{ ec2_security_group_id }}"  # security group name
     instance_type: "{{ instance_type }}"
@@ -17,11 +18,11 @@
                sudo systemctl restart httpd
                sudo systemctl enable httpd
     wait: true
-    count: 1  # default
-    count_tag:
-      Name: DemoApache
-    instance_tags:
-      Name: DemoApache
+#    count: 1  # default
+#    count_tag:
+#      Name: DemoApache
+#    instance_tags:
+#      Name: DemoApache
     assign_public_ip: yes
   register: ec2_pub_subnet1
 
