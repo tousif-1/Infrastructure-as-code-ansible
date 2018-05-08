@@ -6,6 +6,6 @@
 #    ec2_ins_2: "i-05271775041af6322"
   roles:
     - vpc
-    - ec2
+#    - ec2
 #    - dnslab
-    - ELB
+#   - ELB
